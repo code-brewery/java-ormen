@@ -2,6 +2,7 @@ package org.codebrewery;
 
 import com.ning.http.client.ListenableFuture;
 
+import java.io.IOException;
 import java.util.concurrent.ExecutionException;
 
 /**
@@ -39,12 +40,12 @@ public interface CrudModelInterface {
      *
      * The url will be constructed the following way baseurl + identifierValue
      */
-    void update(ActionCompletedInterface actionCompletedInterface) throws ExecutionException, InterruptedException;
+    void update(ActionCompletedInterface actionCompletedInterface) throws ExecutionException, InterruptedException, IOException;
 
     /**
      * Creates a new resource
      *
      * The url will only consist o fthe base url
      */
-    void create(ActionCompletedInterface actionCompletedInterface) throws ExecutionException, InterruptedException;
+    void create(ActionCompletedInterface actionCompletedInterface) throws ExecutionException, InterruptedException, IOException;
 }

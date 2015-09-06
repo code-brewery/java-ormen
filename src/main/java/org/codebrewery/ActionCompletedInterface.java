@@ -6,7 +6,7 @@ package org.codebrewery;
 public interface ActionCompletedInterface {
 
 
-    void onDone(AbstractRESTModel model);
+    void onDone(RESTModel model);
 
     void onError(Throwable e);
 

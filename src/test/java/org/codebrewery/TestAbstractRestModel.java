@@ -1,19 +1,12 @@
 package org.codebrewery;
 
 import com.ning.http.client.AsyncCompletionHandler;
-import com.ning.http.client.FluentCaseInsensitiveStringsMap;
-import com.ning.http.client.Response;
-import com.ning.http.client.cookie.Cookie;
-import com.ning.http.client.uri.Uri;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.ParseException;
+
 import org.junit.Before;
 import org.junit.Test;
 
+
 import java.io.IOException;
-import java.io.InputStream;
-import java.nio.ByteBuffer;
-import java.util.List;
 
 import static org.junit.Assert.*;
 
@@ -24,7 +17,7 @@ public class TestAbstractRestModel {
     private MockRestModel mockModel;
     @Before
     public void before() {
-        mockModel = new MockRestModel();
+        mockModel = new MockRestModel("plutoTheTester");
     }
 
     @Test
@@ -49,6 +42,7 @@ public class TestAbstractRestModel {
 
     @Test
     public void testThatSettingANewConfigWorks() {
+
         mockModel.setConfiguration(new RestModelConfiguration(){
             @Override
             public String getBaseUrl() {
@@ -68,9 +62,10 @@ public class TestAbstractRestModel {
         ActionCompletedInterface mockAction = new ActionCompletedInterface() {
 
             @Override
-            public void onDone(AbstractRESTModel model) {
-
+            public void onDone(RESTModel model) {
+                    MockRestModel resp = (MockRestModel) model;
                     assertNotNull(model);
+                    assertEquals(resp.name, "plutoTheTester");
             }
 
             @Override
@@ -95,7 +90,7 @@ public class TestAbstractRestModel {
         ActionCompletedInterface mockAction = new ActionCompletedInterface() {
 
             @Override
-            public void onDone(AbstractRESTModel model) {
+            public void onDone(RESTModel model) {
 
                 fail();
             }
@@ -116,13 +111,16 @@ public class TestAbstractRestModel {
 
     }
 
+
     @Test
-    public void testConvertResponseToJSONObject() throws IOException, ParseException {
+    public void testConvertRESTModelToJSON() throws IOException {
 
-        Response mockResponse = new MockResponse();
+        String json = mockModel.convertRESTModelToJSON();
 
-        JSONObject jsonObject = mockModel.convertResponseToJSONObject(mockResponse);
+        assertEquals("{\"name\":\"plutoTheTester\"}",json);
 
-        assertTrue(jsonObject.containsKey("name"));
     }
+
+
+
 }

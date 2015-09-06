@@ -57,7 +57,7 @@ public class MockResponse implements Response {
 
     @Override
     public String getResponseBody() throws IOException {
-        return "{\"name\":\"pluto\"}";
+        return "{\"name\":\"plutoTheTester\"}";
     }
 
     @Override

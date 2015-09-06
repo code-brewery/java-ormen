@@ -3,8 +3,6 @@ package org.codebrewery;
 import com.ning.http.client.AsyncCompletionHandler;
 import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.Response;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 import java.io.IOException;
@@ -23,7 +21,7 @@ import java.util.concurrent.ExecutionException;
  *
  *
  */
-public abstract class AbstractRESTModel implements CrudModelInterface {
+public abstract class RESTModel implements CrudModelInterface {
 
     private RestModelConfiguration config = new RestModelConfiguration();
 
@@ -48,13 +46,7 @@ public abstract class AbstractRESTModel implements CrudModelInterface {
      */
     abstract  String identifierValue();
 
-    /**
-     * Override this method when you want to convert the json data to JAVA Objects
-     *
-     * @param response
-     * @return
-     */
-    public abstract  AbstractRESTModel  parse(JSONObject response) throws IOException;
+
 
 
     protected String generateCollectionUrl() {
@@ -74,9 +66,34 @@ public abstract class AbstractRESTModel implements CrudModelInterface {
         this.config = config;
 
     }
-    protected JSONObject convertResponseToJSONObject(Response response) throws IOException, ParseException {
 
-        return (JSONObject)new JSONParser().parse(response.getResponseBody());
+    /**
+     * This method is used by the RESTModel when converting Responses to RestModels
+     *
+     * It will use the JSONConverter, that will use a ObjectMapper to resolve the different attribute names
+     *
+     * @param response
+     * @return
+     * @throws IOException
+     * @throws ParseException
+     */
+    protected RESTModel convertJSONToRESTModelObject(String json) throws IOException, ParseException {
+
+        return JSONConverter.unMarshall(json, this.getClass());
+    }
+
+    /**
+     * This method is used by the RESTModel when converting RestModels to json.
+     *
+     * It will use the JSONConverter, that will use a ObjectMapper to resolve the different attribute names
+     *
+     * @return
+     * @throws IOException
+     * @throws ParseException
+     */
+    protected String convertRESTModelToJSON() throws IOException {
+
+        return JSONConverter.marshall(this);
 
     }
 
@@ -88,7 +105,7 @@ public abstract class AbstractRESTModel implements CrudModelInterface {
             public Object onCompleted(Response response) throws Exception {
 
 
-                actions.onDone(parse(convertResponseToJSONObject(response)));
+                actions.onDone(convertJSONToRESTModelObject(response.getResponseBody()));
 
                 return null;
             }
@@ -106,30 +123,26 @@ public abstract class AbstractRESTModel implements CrudModelInterface {
 
     public void fetch(final ActionCompletedInterface actions) throws ExecutionException, InterruptedException {
 
-
-        AsyncHttpClient asyncHttpClient = new AsyncHttpClient();
-        String urlToUse = generatedInstanceUrl();
-        asyncHttpClient.prepareGet(urlToUse).execute(getAsyncCompletionHandler(actions));
-
+        new AsyncHttpClient().prepareGet(generatedInstanceUrl()).execute(getAsyncCompletionHandler(actions));
 
     }
 
     public void destroy(final ActionCompletedInterface actions) throws ExecutionException, InterruptedException {
 
-
-
-
-    }
-
-    public void update(final ActionCompletedInterface actions) throws ExecutionException, InterruptedException {
-
-
+        new AsyncHttpClient().prepareDelete(generatedInstanceUrl()).execute(getAsyncCompletionHandler(actions));
 
     }
 
-    public void create(final ActionCompletedInterface actions) throws ExecutionException, InterruptedException {
+    public void update(final ActionCompletedInterface actions) throws ExecutionException, InterruptedException, IOException {
+
+        new AsyncHttpClient().preparePut(generatedInstanceUrl()).setBody(convertRESTModelToJSON()).execute(getAsyncCompletionHandler(actions));
+
+    }
 
 
+    public void create(final ActionCompletedInterface actions) throws ExecutionException, InterruptedException, IOException {
+
+        new AsyncHttpClient().preparePost(generateCollectionUrl()).setBody(convertRESTModelToJSON()).execute(getAsyncCompletionHandler(actions));
 
     }
 
