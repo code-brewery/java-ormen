@@ -35,10 +35,10 @@ public class DogModel extends RESTModel {
 
     public final String name;
 
-    public MockRestModel() {
+    public DogModel() {
         this.name = "";
     }
-    public MockRestModel(String name) {
+    public DogModel(String name) {
         this.name = name;
     }
 
