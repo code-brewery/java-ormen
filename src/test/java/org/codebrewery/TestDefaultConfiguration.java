@@ -1,8 +1,9 @@
 package org.codebrewery;
 
 
+import org.junit.Before;
 import org.junit.Test;
-
+import static org.junit.Assert.*;
 
 import java.util.concurrent.ExecutionException;
 
@@ -19,21 +20,17 @@ import java.util.concurrent.ExecutionException;
  *
  *
  */
-public class TestRESTModel {
-
-    @Test
-    public void testToCreateRestModel() throws ExecutionException, InterruptedException {
-
-
-    }
+public class TestDefaultConfiguration {
 
 
     @Test
-    public void creatingAResponseObject() {
+    public void testToGenerateFullHttpUrl() throws ExecutionException, InterruptedException {
 
+        RestModelConfiguration config = new RestModelConfiguration();
 
+        config.getRequestBaseUrl();
 
-
+        assertEquals("http://localhost:8081/api",config.getRequestBaseUrl());
 
     }
 

@@ -2,7 +2,6 @@ package org.codebrewery;
 
 import com.ning.http.client.AsyncCompletionHandler;
 import com.ning.http.client.AsyncHttpClient;
-import com.ning.http.client.ListenableFuture;
 import com.ning.http.client.Response;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -25,6 +24,8 @@ import java.util.concurrent.ExecutionException;
  *
  */
 public abstract class AbstractRESTModel implements CrudModelInterface {
+
+    private RestModelConfiguration config = new RestModelConfiguration();
 
     /**
      * This method returns the base url for a resource.
@@ -56,24 +57,32 @@ public abstract class AbstractRESTModel implements CrudModelInterface {
     public abstract  AbstractRESTModel  parse(JSONObject response) throws IOException;
 
 
-    private String generateFullHttpUrl() {
+    protected String generateCollectionUrl() {
 
-        return "http://localhost:8081"+resourceUrl();
+        return config.getRequestBaseUrl() + "/" + resourceUrl();
 
     }
 
-    private JSONObject convertResponseToJSONObject(Response response) throws IOException, ParseException {
+    protected String generatedInstanceUrl() {
+
+        return generateCollectionUrl() + "/" + identifierValue();
+
+    }
+
+    public void setConfiguration( RestModelConfiguration config ) {
+
+        this.config = config;
+
+    }
+    protected JSONObject convertResponseToJSONObject(Response response) throws IOException, ParseException {
 
         return (JSONObject)new JSONParser().parse(response.getResponseBody());
 
     }
 
-    public void fetch(final ActionCompletedInterface actions) throws ExecutionException, InterruptedException {
+    protected AsyncCompletionHandler getAsyncCompletionHandler(ActionCompletedInterface actions) {
 
-
-        AsyncHttpClient asyncHttpClient = new AsyncHttpClient();
-        String urlToUse = generateFullHttpUrl() + identifierValue();
-        asyncHttpClient.prepareGet(urlToUse).execute(new AsyncCompletionHandler() {
+        return new AsyncCompletionHandler(){
 
             @Override
             public Object onCompleted(Response response) throws Exception {
@@ -81,7 +90,6 @@ public abstract class AbstractRESTModel implements CrudModelInterface {
 
                 actions.onDone(parse(convertResponseToJSONObject(response)));
 
-                // is it possible to not return void?
                 return null;
             }
 
@@ -91,7 +99,18 @@ public abstract class AbstractRESTModel implements CrudModelInterface {
                 actions.onError(t);
 
             }
-        });
+        };
+
+    }
+
+
+    public void fetch(final ActionCompletedInterface actions) throws ExecutionException, InterruptedException {
+
+
+        AsyncHttpClient asyncHttpClient = new AsyncHttpClient();
+        String urlToUse = generatedInstanceUrl();
+        asyncHttpClient.prepareGet(urlToUse).execute(getAsyncCompletionHandler(actions));
+
 
     }
 

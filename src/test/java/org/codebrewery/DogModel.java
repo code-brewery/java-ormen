@@ -15,11 +15,6 @@ public class DogModel extends AbstractRESTModel {
 
     public final int age;
 
-    public DogModel() {
-
-        name = "pluto";
-        age = 5;
-    }
 
     public DogModel(String name, int age) {
         this.name = name;
@@ -46,6 +41,7 @@ public class DogModel extends AbstractRESTModel {
         return new DogModel(name,123);
 
     }
+
     // dedicated method
     public String bark() {
         return "VOFF says" + this.name;
