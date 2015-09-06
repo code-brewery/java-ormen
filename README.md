@@ -7,10 +7,11 @@ The Async java-ormen library purpose is to allow Java applications to easily exe
 
 The library creates an abstraction layer on top of REST. The user of this library will in fact know very little about what protocol is used. 
 
-The library has been designed using the Future API. If you you don't need a synchronous library you can tell the library to execute query's synchronous.  
+The library has been designed using the Future API. If you you don't need a ascynchronous library you can tell the library to execute query's synchronous.  
 
+The library uses the Jackson ObjectMapper, so its possible to use jackson annotations to describe how objects shall be marshalled and unmarshalled. 
 
-
+The library strives for creating immutable objects.
 
 ## Usage
 
@@ -30,57 +31,36 @@ The AbstractRest model gives you  4 public methods for interacting with the rest
 
 ```java
 
-public class DogModel extends AbstractRESTModel {
-
-    // private vars that shall map against the json data fetched
+public class DogModel extends RESTModel {
 
     public final String name;
 
-    public final int age;
-
-    public DogModel() {
-
-        name = "pluto";
-        age = 5;
+    public MockRestModel() {
+        this.name = "";
     }
-
-    public DogModel(String name, int age) {
+    public MockRestModel(String name) {
         this.name = name;
-        this.age = age;
     }
 
     @Override
-    protected String resourceUrl() {
-
-        return "/rest/dogs/";
-
+    String resourceUrl() {
+        return "dogs";
     }
 
     @Override
-    protected String identifierValue() {
+    String identifierValue() {
 
-        return this.name;
-    }
-
-    @Override
-    public final AbstractRESTModel  parse(JSONObject responseJson) {
-        String name = (String) responseJson.get("name");
-
-        return new DogModel(name,123);
+        return "identifier";
 
     }
-    // dedicated method
-    public String bark() {
-        return "VOFF says" + this.name;
-    }
-
 
 
 }
+
 ```
 
 
-The Dog model has a method called ```resourceUrl```. This url will point on to the url location where we can work on dogs. The Dog model has a method called  ```identifierValue```. It will be appended on the url on RUD operations. The ```parse``` method is there so you can convert raw json data to DogModel objects. This method will be called every time data is fetched from the server. ( the method will be a bit automagic in the future and populate the model with values without you needing to writing a parser ).
+The Dog model has a method called ```resourceUrl```. This url will point on to the url location where we can work on dogs. The Dog model has a method called  ```identifierValue```. It will be appended on the url on RUD operations.  The good part here is that we will not need to write any marshall or unmarshalling logic. This is handled the RestModel class. But if you get into truble you can use jackson json annotations on your fields. 
 
 
 So now we have created a model. Its now time to use it to fetch data. Simply write the following in your code. Remember, these operations are async so we will add a sleep in the end ( only for educational purpose ).
@@ -96,7 +76,7 @@ public class App
         System.out.println("fetching the dog");
         DogModel pluto = new DogModel();
         pluto.fetch(new ActionCompletedInterface() {
-            public void onDone(AbstractRESTModel model) {
+            public void onDone(RESTModel model) {
 
                 DogModel fetchedModel = (DogModel)model;
 
