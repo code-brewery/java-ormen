@@ -138,7 +138,7 @@ public class TestAbstractRestModel {
 
 
     @Test
-    public void testThatPutReturnsRightUrl() throws IOException {
+    public void testThatPostReturnsRightUrl() throws IOException {
         CompletableFuture<RESTModel> future = mockModel.create();
         Request request = mockModel.getBoundRequestBuilder().build();
 
@@ -147,7 +147,7 @@ public class TestAbstractRestModel {
     }
 
     @Test
-    public void testThatPostReturnsRightUrl() {
+    public void testThatDeleteReturnsRightUrl() {
         CompletableFuture<RESTModel> future = mockModel.destroy();
         Request request = mockModel.getBoundRequestBuilder().build();
 
@@ -155,8 +155,22 @@ public class TestAbstractRestModel {
 
     }
 
+    @Test
+    public <U> void testThatUpdateReturnsRightUrl() throws IOException {
+        CompletableFuture<RESTModel> future = mockModel.update();
+        Request request = mockModel.getBoundRequestBuilder().build();
+        future.thenApply(result -> isDone(result));      // sync callback
 
+        assertEquals("http://localhost:8081/api/dogs/identifier", request.getUrl());
 
+    }
+
+    private Void isDone(RESTModel result) {
+        MockRestModel model = (MockRestModel)result;
+        System.out.println(model.name);
+
+        return null;
+    }
 
 
 }
