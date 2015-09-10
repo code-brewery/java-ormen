@@ -2,11 +2,19 @@ package org.codebrewery;
 
 import com.ning.http.client.AsyncCompletionHandler;
 
+import com.ning.http.client.AsyncHttpClient;
+import com.ning.http.client.Request;
+import com.ning.http.client.Response;
+import com.ning.http.client.listenable.AbstractListenableFuture;
 import org.junit.Before;
 import org.junit.Test;
 
 
 import java.io.IOException;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import static org.junit.Assert.*;
 
@@ -35,7 +43,7 @@ public class TestAbstractRestModel {
 
         String fullHttpUrl = mockModel.generatedInstanceUrl();
 
-        assertEquals("http://localhost:8081/api/dogs/identifier",fullHttpUrl);
+        assertEquals("http://localhost:8081/api/dogs/identifier", fullHttpUrl);
 
     }
 
@@ -57,62 +65,6 @@ public class TestAbstractRestModel {
 
 
     @Test
-    public void testThatAsyncCompletionHandlerDoesWhatItsSuposedTo() throws Exception {
-
-        ActionCompletedInterface mockAction = new ActionCompletedInterface() {
-
-            @Override
-            public void onDone(RESTModel model) {
-                    MockRestModel resp = (MockRestModel) model;
-                    assertNotNull(model);
-                    assertEquals(resp.name, "plutoTheTester");
-            }
-
-            @Override
-            public void onError(Throwable e) {
-
-                fail();
-            }
-        };
-
-        AsyncCompletionHandler handler = mockModel.getAsyncCompletionHandler(mockAction);
-
-        // invoke the handler directly
-        handler.onCompleted(new MockResponse());
-
-
-    }
-
-
-    @Test
-    public void testThatAsyncCompletionHandleronERRORDoesWhatItsSuposedTo() throws Exception {
-
-        ActionCompletedInterface mockAction = new ActionCompletedInterface() {
-
-            @Override
-            public void onDone(RESTModel model) {
-
-                fail();
-            }
-
-            @Override
-            public void onError(Throwable e) {
-
-                assertNotNull(e);
-
-            }
-        };
-
-        AsyncCompletionHandler handler = mockModel.getAsyncCompletionHandler(mockAction);
-
-        // invoke the handler directly
-        handler.onThrowable(new Exception());
-
-
-    }
-
-
-    @Test
     public void testConvertRESTModelToJSON() throws IOException {
 
         String json = mockModel.convertRESTModelToJSON();
@@ -120,6 +72,90 @@ public class TestAbstractRestModel {
         assertEquals("{\"name\":\"plutoTheTester\"}",json);
 
     }
+
+
+    @Test
+    public void testThatWrapExecutionInCompletableFutureMethodReturnsValidFuture() throws Exception {
+
+
+        CompletableFuture<RESTModel> handler = mockModel.wrapExecutionInCompletableFuture(new AbstractListenableFuture<Response>() {
+            @Override
+            public void done() {
+
+            }
+
+            @Override
+            public void abort(Throwable throwable) {
+
+            }
+
+            @Override
+            public void touch() {
+
+            }
+
+            @Override
+            public boolean cancel(boolean mayInterruptIfRunning) {
+                return false;
+            }
+
+            @Override
+            public boolean isCancelled() {
+                return false;
+            }
+
+            @Override
+            public boolean isDone() {
+                return false;
+            }
+
+            @Override
+            public Response get() throws InterruptedException, ExecutionException {
+                return new MockResponse();
+            }
+
+            @Override
+            public Response get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
+                return null;
+            }
+        });
+
+        MockRestModel resp = (MockRestModel) handler.get();
+
+        assertEquals("plutoTheTester", resp.name);
+
+    }
+
+
+    @Test
+    public void testThatFetchReturnsRightUrl() {
+        CompletableFuture<RESTModel> future = mockModel.fetch();
+        Request request = mockModel.getBoundRequestBuilder().build();
+
+        assertEquals("http://localhost:8081/api/dogs/identifier",request.getUrl());
+
+    }
+
+
+    @Test
+    public void testThatPutReturnsRightUrl() throws IOException {
+        CompletableFuture<RESTModel> future = mockModel.create();
+        Request request = mockModel.getBoundRequestBuilder().build();
+
+        assertEquals("http://localhost:8081/api/dogs",request.getUrl());
+
+    }
+
+    @Test
+    public void testThatPostReturnsRightUrl() {
+        CompletableFuture<RESTModel> future = mockModel.destroy();
+        Request request = mockModel.getBoundRequestBuilder().build();
+
+        assertEquals("http://localhost:8081/api/dogs/identifier",request.getUrl());
+
+    }
+
+
 
 
 

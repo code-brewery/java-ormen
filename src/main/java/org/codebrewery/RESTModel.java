@@ -1,11 +1,13 @@
 package org.codebrewery;
 
-import com.ning.http.client.AsyncCompletionHandler;
 import com.ning.http.client.AsyncHttpClient;
+import com.ning.http.client.ListenableFuture;
 import com.ning.http.client.Response;
 import org.json.simple.parser.ParseException;
 
 import java.io.IOException;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
 import java.util.concurrent.ExecutionException;
 
 
@@ -49,13 +51,13 @@ public abstract class RESTModel implements CrudModelInterface {
 
 
 
-    protected String generateCollectionUrl() {
+    String generateCollectionUrl() {
 
         return config.getRequestBaseUrl() + "/" + resourceUrl();
 
     }
 
-    protected String generatedInstanceUrl() {
+    String generatedInstanceUrl() {
 
         return generateCollectionUrl() + "/" + identifierValue();
 
@@ -72,12 +74,11 @@ public abstract class RESTModel implements CrudModelInterface {
      *
      * It will use the JSONConverter, that will use a ObjectMapper to resolve the different attribute names
      *
-     * @param response
      * @return
      * @throws IOException
      * @throws ParseException
      */
-    protected RESTModel convertJSONToRESTModelObject(String json) throws IOException, ParseException {
+    RESTModel convertJSONToRESTModelObject(String json) throws IOException, ParseException {
 
         return JSONConverter.unMarshall(json, this.getClass());
     }
@@ -91,58 +92,57 @@ public abstract class RESTModel implements CrudModelInterface {
      * @throws IOException
      * @throws ParseException
      */
-    protected String convertRESTModelToJSON() throws IOException {
+    String convertRESTModelToJSON() throws IOException {
 
         return JSONConverter.marshall(this);
 
     }
 
-    protected AsyncCompletionHandler getAsyncCompletionHandler(ActionCompletedInterface actions) {
+    CompletableFuture<RESTModel> wrapExecutionInCompletableFuture(ListenableFuture<Response> futureResponse) {
 
-        return new AsyncCompletionHandler(){
+        return CompletableFuture.supplyAsync(() -> {
 
-            @Override
-            public Object onCompleted(Response response) throws Exception {
+            try {
+                return convertJSONToRESTModelObject(futureResponse.get().getResponseBody());
+            } catch (IOException | ParseException | InterruptedException | ExecutionException e4) {
 
-
-                actions.onDone(convertJSONToRESTModelObject(response.getResponseBody()));
-
-                return null;
-            }
-
-            @Override
-            public void onThrowable(Throwable t) {
-
-                actions.onError(t);
+                throw new CompletionException(e4);
 
             }
-        };
+
+
+        });
+    }
+
+
+    ListenableFuture<Response> execute(AsyncHttpClient.BoundRequestBuilder boundRequestBuilder) {
+
+        return boundRequestBuilder.execute();
+
+    }
+
+    public CompletableFuture<RESTModel> fetch()  {
+
+        return wrapExecutionInCompletableFuture(execute(new AsyncHttpClient().prepareGet(generatedInstanceUrl())));
+
+    }
+
+    public CompletableFuture<RESTModel> destroy() {
+
+        return wrapExecutionInCompletableFuture(execute(new AsyncHttpClient().prepareDelete(generatedInstanceUrl())));
+
+    }
+
+   public CompletableFuture<RESTModel> update() throws IOException {
+
+        return wrapExecutionInCompletableFuture(execute(new AsyncHttpClient().preparePut(generatedInstanceUrl()).setBody(convertRESTModelToJSON())));
 
     }
 
 
-    public void fetch(final ActionCompletedInterface actions) throws ExecutionException, InterruptedException {
+    public CompletableFuture<RESTModel> create() throws IOException {
 
-        new AsyncHttpClient().prepareGet(generatedInstanceUrl()).execute(getAsyncCompletionHandler(actions));
-
-    }
-
-    public void destroy(final ActionCompletedInterface actions) throws ExecutionException, InterruptedException {
-
-        new AsyncHttpClient().prepareDelete(generatedInstanceUrl()).execute(getAsyncCompletionHandler(actions));
-
-    }
-
-    public void update(final ActionCompletedInterface actions) throws ExecutionException, InterruptedException, IOException {
-
-        new AsyncHttpClient().preparePut(generatedInstanceUrl()).setBody(convertRESTModelToJSON()).execute(getAsyncCompletionHandler(actions));
-
-    }
-
-
-    public void create(final ActionCompletedInterface actions) throws ExecutionException, InterruptedException, IOException {
-
-        new AsyncHttpClient().preparePost(generateCollectionUrl()).setBody(convertRESTModelToJSON()).execute(getAsyncCompletionHandler(actions));
+        return wrapExecutionInCompletableFuture(execute(new AsyncHttpClient().preparePost(generateCollectionUrl()).setBody(convertRESTModelToJSON())));
 
     }
 
