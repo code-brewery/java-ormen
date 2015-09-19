@@ -1,7 +1,6 @@
 package org.codebrewery;
 
 
-import org.junit.Before;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
@@ -26,11 +25,11 @@ public class TestDefaultConfiguration {
     @Test
     public void testToGenerateFullHttpUrl() throws ExecutionException, InterruptedException {
 
-        RestModelConfiguration config = new RestModelConfiguration();
 
-        config.getRequestBaseUrl();
+        ApiConfig apiConfig = new ApiConfig.ConfigBuilder().apiLocation("api").port("8081").host("http://localhost").build();
 
-        assertEquals("http://localhost:8081/api",config.getRequestBaseUrl());
+        assertEquals("http://localhost:8081/api", apiConfig.getRequestBaseUrl());
+
 
     }
 

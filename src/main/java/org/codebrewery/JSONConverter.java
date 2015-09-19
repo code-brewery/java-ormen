@@ -21,7 +21,7 @@ public class JSONConverter {
      * @return
      * @throws IOException
      */
-    public static String marshall(RESTModel restModel) throws IOException {
+    public static String marshall(Model restModel) throws IOException {
 
         ObjectMapper mapper = new ObjectMapper();
         return mapper.writeValueAsString(restModel);
@@ -34,7 +34,7 @@ public class JSONConverter {
      * @return
      * @throws IOException
      */
-    public static RESTModel unMarshall(String json, Class<? extends RESTModel> klazz) throws IOException {
+    public static Model unMarshall(String json, Class<? extends Model> klazz) throws IOException {
 
         ObjectMapper mapper = new ObjectMapper();
         return mapper.readValue(json, klazz);
