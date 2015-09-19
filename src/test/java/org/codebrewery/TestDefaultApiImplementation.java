@@ -16,12 +16,9 @@ public class TestDefaultApiImplementation {
         DogModel mockModel = new DogModel("pluto",5);
         ApiConfig apiConfig = new ApiConfig.ConfigBuilder().apiLocation("api").port("8081").host("http://localhost").build();
         MockDefaultApiImplementation mockImpl = new MockDefaultApiImplementation(apiConfig);
-        ApiFactory.setDefaultImplementation(mockImpl);
-
-        ApiInterface defaultImplementation = ApiFactory.getDefaultImplementation();
 
         // execute
-        DogModel savedModel = (DogModel)  defaultImplementation.save(mockModel);
+        DogModel savedModel = (DogModel)  mockImpl.save(mockModel);
 
         // assert
         assertEquals("pluto",savedModel.getName());
@@ -36,12 +33,10 @@ public class TestDefaultApiImplementation {
         DogModel mockModel = new DogModel("pluto",5);
         ApiConfig apiConfig = new ApiConfig.ConfigBuilder().apiLocation("api").port("8081").host("http://localhost").build();
         MockDefaultApiImplementation mockImpl = new MockDefaultApiImplementation(apiConfig);
-        ApiFactory.setDefaultImplementation(mockImpl);
 
-        ApiInterface defaultImplementation = ApiFactory.getDefaultImplementation();
 
         // execute
-        defaultImplementation.delete(mockModel);
+        mockImpl.delete(mockModel);
 
 
 
@@ -55,12 +50,10 @@ public class TestDefaultApiImplementation {
         DogModel mockModel = new DogModel("pluto", 5);
         ApiConfig apiConfig = new ApiConfig.ConfigBuilder().apiLocation("api").port("8081").host("http://localhost").build();
         MockDefaultApiImplementation mockImpl = new MockDefaultApiImplementation(apiConfig);
-        ApiFactory.setDefaultImplementation(mockImpl);
 
-        ApiInterface defaultImplementation = ApiFactory.getDefaultImplementation();
 
         // execute
-        DogModel savedModel = (DogModel) defaultImplementation.refresh(mockModel);
+        DogModel savedModel = (DogModel) mockImpl.refresh(mockModel);
 
         // assert
         assertEquals("pluto", savedModel.getName());
@@ -76,12 +69,9 @@ public class TestDefaultApiImplementation {
         DogModel mockModel = new DogModel("pluto",5);
         ApiConfig apiConfig = new ApiConfig.ConfigBuilder().apiLocation("api").port("8081").host("http://localhost").build();
         MockDefaultApiImplementation mockImpl = new MockDefaultApiImplementation(apiConfig);
-        ApiFactory.setDefaultImplementation(mockImpl);
-
-        ApiInterface defaultImplementation = ApiFactory.getDefaultImplementation();
 
         // execute
-        DogModel savedModel = (DogModel)  defaultImplementation.update(mockModel);
+        DogModel savedModel = (DogModel)  mockImpl.update(mockModel);
 
         // assert
         assertEquals("pluto",savedModel.getName());

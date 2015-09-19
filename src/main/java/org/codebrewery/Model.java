@@ -25,7 +25,7 @@ public abstract class Model {
      *          The name of the ApiInterface. If this is null then the default ApiInterface is returned.
      */
     public static ApiInterface api(String apiImpl) {
-        return ApiFactory.getServer(apiImpl);
+        return null;
     }
 
     /**
@@ -199,7 +199,7 @@ public abstract class Model {
          */
         public ApiInterface api() {
 
-            return ApiFactory.getServer(serverName);
+            return ApiFactory.getDefaultImplementation();
         }
 
 

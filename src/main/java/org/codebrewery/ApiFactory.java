@@ -8,21 +8,10 @@ package org.codebrewery;
  * The factory returns objects implementing the APIInterface
  */
 public class ApiFactory {
-    private static ApiInterface defaultServer = new DefaultApiImplementation();
-
-    public static ApiInterface getServer(String server) {
-        return null;
-    }
 
     public static ApiInterface getDefaultImplementation() {
-        return defaultServer;
+        return new DefaultApiImplementation();
     }
 
-    /**
-     * This method is only for mocking, hence package scope
-     * @param apiImpl
-     */
-    public static void setDefaultImplementation(final ApiInterface apiImpl) {
-        defaultServer = apiImpl;
-    }
+
 }
