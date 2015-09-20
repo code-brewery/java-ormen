@@ -6,7 +6,9 @@ import org.powermock.api.easymock.PowerMock;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
+import java.io.IOException;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 import static org.easymock.EasyMock.expect;
 
@@ -21,7 +23,7 @@ import static org.powermock.api.easymock.PowerMock.*;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(ApiFactory.class)
-public class TestModel {
+public class TestModelNegative {
 
 
     private ApiConfig apiConfig;
@@ -39,17 +41,21 @@ public class TestModel {
     public void setUpWithMock(String fileName) {
         setUpWithMock(fileName,null);
     }
-    public void setUpWithMock(Exception exception) {
-        setUpWithMock(null,exception);
+    public void setUpWithMock(ExecutionException exception) {
+        setUpWithMock(null, exception);
     }
-    public void setUpWithMock(String fileName,Exception e) {
+    public void setUpWithMock(String fileName,ExecutionException e) {
         // 1. create config
         // 2. create mock
         // 3. init mock
 
         apiConfig = new ApiConfig.ConfigBuilder().apiLocation("api").port("8081").host("localhost").build();
-        mockApiImpl = new MockDefaultApiImplementation(apiConfig,fileName);
-        // We create a new instance of test class under test as usually.
+
+        if(e != null) {
+            mockApiImpl = new MockDefaultApiImplementation(apiConfig, e);
+        } else {
+            mockApiImpl = new MockDefaultApiImplementation(apiConfig, fileName);
+        }// We create a new instance of test class under test as usually.
 
         // This is the way to tell PowerMock to mock all static methods of a
         // given class
@@ -64,87 +70,56 @@ public class TestModel {
 
 
 
-    @Test
+    @Test(expected = JavaOrmenException.class)
     public void save_model() throws JavaOrmenException {
-        setUpWithMock();
+        setUpWithMock(new ExecutionException("BOM",new IOException("failed to save the model")));
         Model model = new DogModel();
 
         DogModel  changedModel  = (DogModel) model.save();
 
-        // Note how we verify the class, not the instance!
-        PowerMock.verifyAll();
-        // Assert that the ID is correct
-        assertEquals("pluto", changedModel.getName());
-        assertEquals("http://localhost:8081/api/dogs",mockApiImpl.getLatestExecutedRequestBuilder().getUrl());
 
     }
 
 
 
-    @Test
+    @Test(expected = JavaOrmenException.class)
     public void delete_model() throws JavaOrmenException {
-        setUpWithMock();
+        setUpWithMock(new ExecutionException("BOM", new IOException("failed to save the model")));
         Model model = new DogModel("pluto",123);
 
         model.delete();
 
-        // Note how we verify the class, not the instance!
-        PowerMock.verifyAll();
-
-        // Assert that the ID is correct
-        assertEquals("http://localhost:8081/api/dogs/pluto",mockApiImpl.getLatestExecutedRequestBuilder().getUrl());
     }
 
 
 
-    @Test
+    @Test(expected = JavaOrmenException.class)
     public void fetch_model() throws JavaOrmenException {
-        setUpWithMock();
+        setUpWithMock(new ExecutionException("BOM",new IOException("failed to save the model")));
         DogModel model = new DogModel("plutoXII",4);
 
         DogModel  changedModel  = (DogModel) model.fetch();
 
-        // Note how we verify the class, not the instance!
-        PowerMock.verifyAll();
-
-        // Assert that the ID is correct
-        assertEquals("pluto", changedModel.getName());
-        assertEquals("http://localhost:8081/api/dogs/plutoXII",mockApiImpl.getLatestExecutedRequestBuilder().getUrl());
-
-        // verify that the returned model has an different name.
-        assertEquals("pluto",changedModel.getName());
-        // verify that the old model still got the old name
-        assertEquals("plutoXII",model.getName());
-
     }
 
-    @Test
+    @Test(expected = JavaOrmenException.class)
     public void update_model() throws JavaOrmenException {
 
-        setUpWithMock();
+        setUpWithMock(new ExecutionException("BOM",new IOException("failed to save the model")));
         Model model = new DogModel("plutoXII",1234);
 
         DogModel  changedModel  = (DogModel) model.update();
 
-        // Note how we verify the class, not the instance!
-        PowerMock.verifyAll();
-        assertEquals("http://localhost:8081/api/dogs/plutoXII", mockApiImpl.getLatestExecutedRequestBuilder().getUrl());
-        assertEquals(3, changedModel.getAge());
     }
 
-    @Test
+    @Test(expected = JavaOrmenException.class)
     public void find_all_instances() throws JavaOrmenException {
 
-        setUpWithMock("twoPlutosInAList.json");
+        setUpWithMock(new ExecutionException("BOM", new IOException("failed to save the model")));
 
         List<Model> listOfDogs = DogModel.find.all();
 
-        // Note how we verify the class, not the instance!
-        PowerMock.verifyAll();
 
-        // Assert that the ID is correct
-        assertEquals(1,listOfDogs.size());
-        assertEquals("pluto",listOfDogs.get(0).getIdentifierValue());
 
     }
 }

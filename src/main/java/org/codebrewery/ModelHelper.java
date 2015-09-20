@@ -6,7 +6,7 @@ import java.lang.reflect.Field;
 /**
  * Created by ejeserl on 9/19/15.
  */
-class ModelHelper {
+public class  ModelHelper {
 
     public static String getCollectionUrlLocation(Class<? extends Model> klazz) {
 

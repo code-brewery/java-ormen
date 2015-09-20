@@ -6,7 +6,6 @@ import java.util.List;
  * Created by ejeserl on 9/19/15.
  */
 public interface ApiInterface<T> {
-    void markAsDirty(Model model);
 
     Model save(Model model) throws JavaOrmenException;
 

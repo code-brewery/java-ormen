@@ -24,11 +24,19 @@ public class MockDefaultApiImplementation extends DefaultApiImplementation{
 
     private Request latest;
     private final String dataToEcho;
-        MockDefaultApiImplementation(ApiConfig config,String name) {
+    private ExecutionException exception;
+
+    MockDefaultApiImplementation(ApiConfig config,String name) {
         super(config);
 
         this.dataToEcho =  convertStreamToString(this.getClass().getResourceAsStream(name));
 
+    }
+
+    MockDefaultApiImplementation(ApiConfig config,ExecutionException exception) {
+        super(config);
+        dataToEcho = "";
+        this.exception= exception;
     }
 
     static String convertStreamToString(java.io.InputStream is) {
@@ -42,6 +50,11 @@ public class MockDefaultApiImplementation extends DefaultApiImplementation{
     }
     @Override
     Response execute(AsyncHttpClient.BoundRequestBuilder boundRequestBuilder) throws ExecutionException, InterruptedException {
+
+        if(this.exception != null) {
+            throw this.exception;
+        }
+
         this.latest = boundRequestBuilder.build();
         return new Response() {
             @Override

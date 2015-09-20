@@ -9,6 +9,7 @@ import static org.junit.Assert.assertEquals;
  */
 public class TestDefaultApiImplementation {
 
+
     @Test
     public void test_that_its_possible_to_save_an_model() throws Exception {
 

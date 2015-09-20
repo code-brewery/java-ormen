@@ -11,15 +11,11 @@ import java.util.concurrent.ExecutionException;
 /**
  * Created by ejeserl on 9/19/15.
  *
- *
+ *19520622-1482
  */
 public class DefaultApiImplementation implements ApiInterface {
 
     private ApiConfig config;
-    @Override
-    public void markAsDirty(Model model) {
-
-    }
 
     DefaultApiImplementation() {
         ApiConfig apiConfig = new ApiConfig.ConfigBuilder().apiLocation("api").port("8081").host("http://localhost").build();
