@@ -120,7 +120,7 @@ public class DefaultApiImplementation implements ApiInterface {
     }
 
     @Override
-    public Model refresh(Model model) throws JavaOrmenException {
+    public Model fetch(Model model) throws JavaOrmenException {
         try {
 
             String url = generateInstanceUrl(model);
@@ -131,7 +131,7 @@ public class DefaultApiImplementation implements ApiInterface {
 
         } catch (InterruptedException  | ExecutionException | IOException e) {
             // wrap the exception in a javaOrmenException
-            throw new JavaOrmenException("failed to refresh model with identifier " + model.getIdentifierValue(),e);
+            throw new JavaOrmenException("failed to fetch model with identifier " + model.getIdentifierValue(),e);
         }
     }
 

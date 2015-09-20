@@ -16,7 +16,7 @@ public interface ApiInterface<T> {
 
     void delete(Model model) throws JavaOrmenException;
 
-    Model refresh(Model model) throws JavaOrmenException;
+    Model fetch(Model model) throws JavaOrmenException;
 
     List<Model> getAll(Class<? extends Model> aClass) throws JavaOrmenException;
 

@@ -1,7 +1,5 @@
 package org.codebrewery;
 
-import com.sun.org.apache.xpath.internal.operations.Mod;
-
 import java.util.List;
 
 
@@ -76,10 +74,10 @@ public abstract class Model {
     /**
      * Refreshes this model from the API.
      *
-     * @see ApiInterface#refresh(Model)
+     * @see ApiInterface#fetch(Model)
      */
     public Model fetch() throws JavaOrmenException {
-        return api().refresh(this);
+        return api().fetch(this);
     }
 
     /**

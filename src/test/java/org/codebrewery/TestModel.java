@@ -10,7 +10,6 @@ import java.util.List;
 
 import static org.easymock.EasyMock.expect;
 
-import static org.easymock.EasyMock.verify;
 import static org.junit.Assert.assertEquals;
 import static org.powermock.api.easymock.PowerMock.*;
 
@@ -25,52 +24,59 @@ import static org.powermock.api.easymock.PowerMock.*;
 public class TestModel {
 
 
+    private ApiConfig apiConfig;
+    private MockDefaultApiImplementation mockApiImpl;
+    /**
+     * All these tests will use powermock.
+     *
+     */
+    public void setUpWithMock() {
 
-    @Test
-    public void save_model() throws JavaOrmenException {
-        long expectedId = 42;
-        ApiConfig apiConfig = new ApiConfig.ConfigBuilder().apiLocation("api").port("8081").host("localhost").build();
-        MockDefaultApiImplementation conf = new MockDefaultApiImplementation(apiConfig,"plainPluto.json");
+        setUpWithMock("plainPluto.json");
+
+    }
+    public void setUpWithMock(String fileName) {
+        // 1. create config
+        // 2. create mock
+        // 3. init mock
+
+        apiConfig = new ApiConfig.ConfigBuilder().apiLocation("api").port("8081").host("localhost").build();
+        mockApiImpl = new MockDefaultApiImplementation(apiConfig,fileName);
         // We create a new instance of test class under test as usually.
 
         // This is the way to tell PowerMock to mock all static methods of a
         // given class
         mockStatic(ApiFactory.class);
 
-        expect(ApiFactory.getDefaultImplementation()).andReturn(conf);
+        expect(ApiFactory.getDefaultImplementation()).andReturn(mockApiImpl);
 
         // Note how we replay the class, not the instance!
         PowerMock.replay(ApiFactory.class);
 
+    }
+
+
+
+    @Test
+    public void save_model() throws JavaOrmenException {
+        setUpWithMock();
         Model model = new DogModel();
 
         DogModel  changedModel  = (DogModel) model.save();
 
         // Note how we verify the class, not the instance!
         PowerMock.verifyAll();
-
         // Assert that the ID is correct
         assertEquals("pluto", changedModel.getName());
+        assertEquals("http://localhost:8081/api/dogs",mockApiImpl.getLatestExecutedRequestBuilder().getUrl());
+
     }
 
 
 
     @Test
     public void delete_model() throws JavaOrmenException {
-        long expectedId = 42;
-        ApiConfig apiConfig = new ApiConfig.ConfigBuilder().apiLocation("api").port("8081").host("localhost").build();
-        MockDefaultApiImplementation mock = new MockDefaultApiImplementation(apiConfig,"plainPluto.json");
-        // We create a new instance of test class under test as usually.
-
-        // This is the way to tell PowerMock to mock all static methods of a
-        // given class
-        mockStatic(ApiFactory.class);
-
-        expect(ApiFactory.getDefaultImplementation()).andReturn(mock);
-
-        // Note how we replay the class, not the instance!
-        PowerMock.replay(ApiFactory.class);
-
+        setUpWithMock();
         Model model = new DogModel("pluto",123);
 
         model.delete();
@@ -79,28 +85,15 @@ public class TestModel {
         PowerMock.verifyAll();
 
         // Assert that the ID is correct
-        assertEquals("http://localhost:8081/api/dogs/pluto",mock.getLatestExecutedRequestBuilder().getUrl());
+        assertEquals("http://localhost:8081/api/dogs/pluto",mockApiImpl.getLatestExecutedRequestBuilder().getUrl());
     }
 
 
 
     @Test
     public void fetch_model() throws JavaOrmenException {
-        long expectedId = 42;
-        ApiConfig apiConfig = new ApiConfig.ConfigBuilder().apiLocation("api").port("8081").host("localhost").build();
-        MockDefaultApiImplementation conf = new MockDefaultApiImplementation(apiConfig,"plainPluto.json");
-        // We create a new instance of test class under test as usually.
-
-        // This is the way to tell PowerMock to mock all static methods of a
-        // given class
-        mockStatic(ApiFactory.class);
-
-        expect(ApiFactory.getDefaultImplementation()).andReturn(conf);
-
-        // Note how we replay the class, not the instance!
-        PowerMock.replay(ApiFactory.class);
-
-        Model model = new DogModel();
+        setUpWithMock();
+        DogModel model = new DogModel("plutoXII",4);
 
         DogModel  changedModel  = (DogModel) model.fetch();
 
@@ -109,49 +102,33 @@ public class TestModel {
 
         // Assert that the ID is correct
         assertEquals("pluto", changedModel.getName());
+        assertEquals("http://localhost:8081/api/dogs/plutoXII",mockApiImpl.getLatestExecutedRequestBuilder().getUrl());
+
+        // verify that the returned model has an different name.
+        assertEquals("pluto",changedModel.getName());
+        // verify that the old model still got the old name
+        assertEquals("plutoXII",model.getName());
+
     }
 
     @Test
     public void update_model() throws JavaOrmenException {
-        long expectedId = 42;
-        ApiConfig apiConfig = new ApiConfig.ConfigBuilder().apiLocation("api").port("8081").host("localhost").build();
-        MockDefaultApiImplementation conf = new MockDefaultApiImplementation(apiConfig,"plainPluto.json");
-        // We create a new instance of test class under test as usually.
 
-        // This is the way to tell PowerMock to mock all static methods of a
-        // given class
-        mockStatic(ApiFactory.class);
+        setUpWithMock();
+        Model model = new DogModel("plutoXII",1234);
 
-        expect(ApiFactory.getDefaultImplementation()).andReturn(conf);
-
-        // Note how we replay the class, not the instance!
-        PowerMock.replay(ApiFactory.class);
-
-        Model model = new DogModel("pluto",1234);
-
-        DogModel  changedModel  = (DogModel) model.fetch();
+        DogModel  changedModel  = (DogModel) model.update();
 
         // Note how we verify the class, not the instance!
         PowerMock.verifyAll();
-
-        // Assert that the ID is correct
+        assertEquals("http://localhost:8081/api/dogs/plutoXII", mockApiImpl.getLatestExecutedRequestBuilder().getUrl());
         assertEquals(3, changedModel.getAge());
     }
+
     @Test
     public void find_all_instances() throws JavaOrmenException {
 
-        ApiConfig apiConfig = new ApiConfig.ConfigBuilder().apiLocation("api").port("8081").host("localhost").build();
-        MockDefaultApiImplementation conf = new MockDefaultApiImplementation(apiConfig,"twoPlutosInAList.json");
-        // We create a new instance of test class under test as usually.
-
-        // This is the way to tell PowerMock to mock all static methods of a
-        // given class
-        mockStatic(ApiFactory.class);
-
-        expect(ApiFactory.getDefaultImplementation()).andReturn(conf);
-
-        // Note how we replay the class, not the instance!
-        PowerMock.replay(ApiFactory.class);
+        setUpWithMock("twoPlutosInAList.json");
 
         List<Model> listOfDogs = DogModel.find.all();
 
@@ -159,8 +136,8 @@ public class TestModel {
         PowerMock.verifyAll();
 
         // Assert that the ID is correct
-
         assertEquals(1,listOfDogs.size());
+        assertEquals("pluto",listOfDogs.get(0).getIdentifierValue());
 
     }
 }

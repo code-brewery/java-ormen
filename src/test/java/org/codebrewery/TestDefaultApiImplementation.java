@@ -54,7 +54,7 @@ public class TestDefaultApiImplementation {
 
 
         // execute
-        DogModel savedModel = (DogModel) mockImpl.refresh(mockModel);
+        DogModel savedModel = (DogModel) mockImpl.fetch(mockModel);
 
         // assert
         assertEquals("pluto", savedModel.getName());
