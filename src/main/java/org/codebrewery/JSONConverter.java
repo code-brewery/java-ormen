@@ -3,6 +3,7 @@ package org.codebrewery;
 import org.codehaus.jackson.map.ObjectMapper;
 
 import java.io.IOException;
+import java.util.List;
 
 /**
  * Created by jepp3 on 2015-09-06.
@@ -39,5 +40,13 @@ public class JSONConverter {
         ObjectMapper mapper = new ObjectMapper();
         return mapper.readValue(json, klazz);
     }
+
+    public static List<Model> unMarshallList(String json, Class<? extends Model> klazz) throws IOException {
+
+        ObjectMapper mapper = new ObjectMapper();
+        return mapper.readValue(json, mapper.getTypeFactory().constructCollectionType(List.class, klazz));
+    }
+
+
 
 }

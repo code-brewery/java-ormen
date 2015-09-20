@@ -51,5 +51,5 @@ public class DogModel extends Model {
         this.name = name;
     }
 
-
+    public static final Finder find = new Finder(DogModel.class);
 }

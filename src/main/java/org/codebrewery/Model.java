@@ -1,5 +1,7 @@
 package org.codebrewery;
 
+import com.sun.org.apache.xpath.internal.operations.Mod;
+
 import java.util.List;
 
 
@@ -38,8 +40,8 @@ public abstract class Model {
      * You may see this as an smart method for update/insert.
      * @see ApiInterface#save(Model)
      */
-    public void save() throws JavaOrmenException {
-        api().save(this);
+    public Model save() throws JavaOrmenException {
+        return api().save(this);
     }
 
 
@@ -48,8 +50,8 @@ public abstract class Model {
      *
      * @see ApiInterface#update(Model)
      */
-    public void update() throws JavaOrmenException{
-        api().update(this);
+    public Model update() throws JavaOrmenException{
+        return api().update(this);
     }
 
     /**
@@ -76,18 +78,19 @@ public abstract class Model {
      *
      * @see ApiInterface#refresh(Model)
      */
-    public void fetch() throws JavaOrmenException {
-        api().refresh(this);
+    public Model fetch() throws JavaOrmenException {
+        return api().refresh(this);
     }
 
     /**
      * A concrete implementation of Find.
      * <p>.
      * </p>
-     * @param <I> type of the Id property
-     * @param <T> type of the model model
      */
-    public static class Finder<I, T> extends Find<I, T> {
+    public static class Finder  {
+
+        private final Class<? extends Model> type;
+
 
         /**
          * Create with the type of the model model.
@@ -114,105 +117,16 @@ public abstract class Model {
          *
          * }</pre>
          */
-        public Finder(Class<T> type) {
-            super(null, type);
-        }
 
-        /**
-         * Create with the type of the model model and specific server name.
-         */
-        public Finder(String serverName, Class<T> type) {
-            super(serverName, type);
-        }
+        public Finder( Class<? extends Model> type) {
 
-    }
-
-    /**
-     * <p>
-     * Typically a Find instance is defined as a public static field on an Model class to provide a
-     * nice way to write queries.
-     *
-    **/
-    public static abstract class Find<I, T> {
-
-        /**
-         * The Model model type.
-         */
-        private final Class<T> type;
-
-        /**
-         * The name of the ApiInterface, null for the default server.
-         */
-        private final String serverName;
-
-        /**
-         * Creates a finder for model of type <code>T</code> with ID of type <code>I</code>.
-         * <p/>
-         * Typically you create Find as a public static field on each Model as the example below.
-         *
-         * <p/>
-         * Note that Find is an abstract class and hence <code>{}</code> is required. This is done so
-         * that the type (class literal) of the Model can be derived from the generics parameter.
-         *
-         * <pre>{@code
-         *
-         *
-         * public class Customer extends BaseModel {
-         *
-         *   // Note the trailing {} as Find is an abstract class.
-         *   // We do this so that we can derive the type literal Customer.class
-         *   // via reflection
-         *   public static final Find<Long,Customer> find = new Find<Long,Customer>(){};
-         *   ...
-         *
-         * }</pre>
-         * <p/>
-         * This enables you to write code like:
-         * <pre>{@code
-         *
-         * Customer customer = Customer.find.byId(42L);
-         *
-         * List<Customer> customers =
-         *     Customer.find
-         *        .select("name, email, dateOfBirth")
-         *        .findList();
-         *
-         * }</pre>
-         *
-         *
-         */
-
-        /**
-         * Construct passing the class literal type of the model type.
-         */
-        protected Find(String serverName, Class<T> type) {
-            this.serverName = serverName;
             this.type = type;
         }
 
-        /**
-         * Return the underlying 'default' ApiInterface.
-         *
-         * <p>
-         * This provides full access to the API such as explicit transaction demarcation etc.
-         *
-         */
-        public ApiInterface api() {
-
-            return ApiFactory.getDefaultImplementation();
+        public List<Model> all() throws JavaOrmenException {
+            return api().getAll(this.type);
         }
-
-
-        /**
-         * Retrieves all entities of the given type.
-         *
-         */
-        public List<T> all() {
-
-            return null;
-        }
-
-
-
     }
+
+
 }

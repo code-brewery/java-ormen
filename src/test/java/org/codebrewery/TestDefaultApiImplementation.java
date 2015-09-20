@@ -13,17 +13,17 @@ public class TestDefaultApiImplementation {
     public void test_that_its_possible_to_save_an_model() throws Exception {
 
         // prepare
-        DogModel mockModel = new DogModel("pluto",5);
-        ApiConfig apiConfig = new ApiConfig.ConfigBuilder().apiLocation("api").port("8081").host("http://localhost").build();
-        MockDefaultApiImplementation mockImpl = new MockDefaultApiImplementation(apiConfig);
+        DogModel mockModel = new DogModel("pluto", 5);
+        ApiConfig apiConfig = new ApiConfig.ConfigBuilder().apiLocation("api").port("8081").host("localhost").build();
+        MockDefaultApiImplementation mockImpl = new MockDefaultApiImplementation(apiConfig,"plainPluto.json");
 
         // execute
-        DogModel savedModel = (DogModel)  mockImpl.save(mockModel);
+        DogModel savedModel = (DogModel) mockImpl.save(mockModel);
 
         // assert
-        assertEquals("pluto",savedModel.getName());
-        assertEquals(3,savedModel.getAge());
-
+        assertEquals("pluto", savedModel.getName());
+        assertEquals(3, savedModel.getAge());
+        assertEquals("http://localhost:8081/api/dogs", mockImpl.getLatestExecutedRequestBuilder().getUrl());
     }
 
     @Test
@@ -31,13 +31,14 @@ public class TestDefaultApiImplementation {
 
         // prepare
         DogModel mockModel = new DogModel("pluto",5);
-        ApiConfig apiConfig = new ApiConfig.ConfigBuilder().apiLocation("api").port("8081").host("http://localhost").build();
-        MockDefaultApiImplementation mockImpl = new MockDefaultApiImplementation(apiConfig);
+        ApiConfig apiConfig = new ApiConfig.ConfigBuilder().apiLocation("api").port("8081").host("localhost").build();
+        MockDefaultApiImplementation mockImpl = new MockDefaultApiImplementation(apiConfig,"plainPluto.json");
 
 
         // execute
         mockImpl.delete(mockModel);
 
+        assertEquals("http://localhost:8081/api/dogs/pluto", mockImpl.getLatestExecutedRequestBuilder().getUrl());
 
 
     }
@@ -48,8 +49,8 @@ public class TestDefaultApiImplementation {
 
         // prepare
         DogModel mockModel = new DogModel("pluto", 5);
-        ApiConfig apiConfig = new ApiConfig.ConfigBuilder().apiLocation("api").port("8081").host("http://localhost").build();
-        MockDefaultApiImplementation mockImpl = new MockDefaultApiImplementation(apiConfig);
+        ApiConfig apiConfig = new ApiConfig.ConfigBuilder().apiLocation("api").port("8081").host("localhost").build();
+        MockDefaultApiImplementation mockImpl = new MockDefaultApiImplementation(apiConfig,"plainPluto.json");
 
 
         // execute
@@ -58,7 +59,7 @@ public class TestDefaultApiImplementation {
         // assert
         assertEquals("pluto", savedModel.getName());
         assertEquals(3, savedModel.getAge());
-
+        assertEquals("http://localhost:8081/api/dogs/pluto", mockImpl.getLatestExecutedRequestBuilder().getUrl());
 
     }
 
@@ -67,8 +68,8 @@ public class TestDefaultApiImplementation {
 
         // prepare
         DogModel mockModel = new DogModel("pluto",5);
-        ApiConfig apiConfig = new ApiConfig.ConfigBuilder().apiLocation("api").port("8081").host("http://localhost").build();
-        MockDefaultApiImplementation mockImpl = new MockDefaultApiImplementation(apiConfig);
+        ApiConfig apiConfig = new ApiConfig.ConfigBuilder().apiLocation("api").port("8081").host("localhost").build();
+        MockDefaultApiImplementation mockImpl = new MockDefaultApiImplementation(apiConfig,"plainPluto.json");
 
         // execute
         DogModel savedModel = (DogModel)  mockImpl.update(mockModel);
@@ -76,7 +77,7 @@ public class TestDefaultApiImplementation {
         // assert
         assertEquals("pluto",savedModel.getName());
         assertEquals(3,savedModel.getAge());
-
+        assertEquals("http://localhost:8081/api/dogs/pluto", mockImpl.getLatestExecutedRequestBuilder().getUrl());
 
     }
 

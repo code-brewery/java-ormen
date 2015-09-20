@@ -2,6 +2,7 @@ package org.codebrewery;
 
 import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.FluentCaseInsensitiveStringsMap;
+import com.ning.http.client.Request;
 import com.ning.http.client.Response;
 import com.ning.http.client.cookie.Cookie;
 import com.ning.http.client.uri.Uri;
@@ -9,7 +10,11 @@ import com.ning.http.client.uri.Uri;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
+import java.util.Scanner;
 import java.util.concurrent.ExecutionException;
 
 /**
@@ -17,13 +22,27 @@ import java.util.concurrent.ExecutionException;
  */
 public class MockDefaultApiImplementation extends DefaultApiImplementation{
 
-    MockDefaultApiImplementation(ApiConfig config) {
+    private Request latest;
+    private final String dataToEcho;
+        MockDefaultApiImplementation(ApiConfig config,String name) {
         super(config);
+
+        this.dataToEcho =  convertStreamToString(this.getClass().getResourceAsStream(name));
+
     }
 
+    static String convertStreamToString(java.io.InputStream is) {
+        java.util.Scanner s = new java.util.Scanner(is).useDelimiter("\\A");
+        return s.hasNext() ? s.next() : "";
+    }
+
+
+    public Request getLatestExecutedRequestBuilder() {
+        return latest;
+    }
     @Override
     Response execute(AsyncHttpClient.BoundRequestBuilder boundRequestBuilder) throws ExecutionException, InterruptedException {
-
+        this.latest = boundRequestBuilder.build();
         return new Response() {
             @Override
             public int getStatusCode() {
@@ -67,7 +86,7 @@ public class MockDefaultApiImplementation extends DefaultApiImplementation{
 
             @Override
             public String getResponseBody() throws IOException {
-                return "{\"name\":\"pluto\",\"age\":3}";
+                return dataToEcho;
             }
 
             @Override
@@ -122,4 +141,6 @@ public class MockDefaultApiImplementation extends DefaultApiImplementation{
         };
 
     }
+
+
 }
