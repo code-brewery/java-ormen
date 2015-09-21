@@ -75,29 +75,29 @@ So now we have created a model. Its now time to use it to fetch data. Simply do 
 
 ```java
 
-        apiConfig = new ApiConfig.ConfigBuilder().apiLocation("api").port("8081").host("localhost").build();
-        
-        DogModel model = new DogModel("pluto",4);
-        
-        DogModel  modelWhenSaved  = (DogModel) model.save();
-        
-        
-        // or why not try to delete a dog
-        
-        model.delete();
-        
-        // or fetch
-        
-        fetchedModel = model.fetch();
-        
-        
-        // or update 
-        
-        updatedModelFromBackend = model.delete();
-        
-        // why not fetch all dogs? 
-        
-        List<Model> listOfDogs = DogModel.find.all();
+apiConfig = new ApiConfig.ConfigBuilder().apiLocation("api").port("8081").host("localhost").build();
+
+DogModel model = new DogModel("pluto",4);
+
+DogModel  modelWhenSaved  = (DogModel) model.save();
+
+
+// or why not try to delete a dog
+
+model.delete();
+
+// or fetch
+
+fetchedModel = model.fetch();
+
+
+// or update 
+
+updatedModelFromBackend = model.delete();
+
+// why not fetch all dogs? 
+
+List<Model> listOfDogs = DogModel.find.all();
 
         
         
