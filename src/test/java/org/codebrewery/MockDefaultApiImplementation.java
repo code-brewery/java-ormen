@@ -1,5 +1,11 @@
 package org.codebrewery;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.ByteBuffer;
+import java.util.List;
+import java.util.concurrent.ExecutionException;
+
 import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.FluentCaseInsensitiveStringsMap;
 import com.ning.http.client.Request;
@@ -7,36 +13,26 @@ import com.ning.http.client.Response;
 import com.ning.http.client.cookie.Cookie;
 import com.ning.http.client.uri.Uri;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.ByteBuffer;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.List;
-import java.util.Scanner;
-import java.util.concurrent.ExecutionException;
-
 /**
  * Created by ejeserl on 9/19/15.
  */
-public class MockDefaultApiImplementation extends DefaultApiImplementation{
+public class MockDefaultApiImplementation extends DefaultApiImplementation {
 
     private Request latest;
     private final String dataToEcho;
     private ExecutionException exception;
 
-    MockDefaultApiImplementation(ApiConfig config,String name) {
+    MockDefaultApiImplementation(ApiConfig config, String name) {
         super(config);
 
-        this.dataToEcho =  convertStreamToString(this.getClass().getResourceAsStream(name));
+        this.dataToEcho = convertStreamToString(this.getClass().getResourceAsStream(name));
 
     }
 
-    MockDefaultApiImplementation(ApiConfig config,ExecutionException exception) {
+    MockDefaultApiImplementation(ApiConfig config, ExecutionException exception) {
         super(config);
         dataToEcho = "";
-        this.exception= exception;
+        this.exception = exception;
     }
 
     static String convertStreamToString(java.io.InputStream is) {
@@ -44,14 +40,14 @@ public class MockDefaultApiImplementation extends DefaultApiImplementation{
         return s.hasNext() ? s.next() : "";
     }
 
-
     public Request getLatestExecutedRequestBuilder() {
         return latest;
     }
+
     @Override
     Response execute(AsyncHttpClient.BoundRequestBuilder boundRequestBuilder) throws ExecutionException, InterruptedException {
 
-        if(this.exception != null) {
+        if (this.exception != null) {
             throw this.exception;
         }
 
@@ -154,6 +150,5 @@ public class MockDefaultApiImplementation extends DefaultApiImplementation{
         };
 
     }
-
 
 }
