@@ -18,7 +18,7 @@ public class TestDefaultApiImplementation {
         MockDefaultApiImplementation mockImpl = new MockDefaultApiImplementation(apiConfig, "plainPluto.json");
 
         // execute
-        DogModel savedModel = (DogModel) mockImpl.save(mockModel);
+        DogModel savedModel = mockImpl.save(mockModel);
 
         // assert
         assertEquals("pluto", savedModel.getName());
@@ -50,7 +50,7 @@ public class TestDefaultApiImplementation {
         MockDefaultApiImplementation mockImpl = new MockDefaultApiImplementation(apiConfig, "plainPluto.json");
 
         // execute
-        DogModel savedModel = (DogModel) mockImpl.fetch(mockModel);
+        DogModel savedModel = mockImpl.fetch(mockModel);
 
         // assert
         assertEquals("pluto", savedModel.getName());
@@ -68,7 +68,7 @@ public class TestDefaultApiImplementation {
         MockDefaultApiImplementation mockImpl = new MockDefaultApiImplementation(apiConfig, "plainPluto.json");
 
         // execute
-        DogModel savedModel = (DogModel) mockImpl.update(mockModel);
+        DogModel savedModel = mockImpl.update(mockModel);
 
         // assert
         assertEquals("pluto", savedModel.getName());
