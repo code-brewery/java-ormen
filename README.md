@@ -93,7 +93,7 @@ fetchedModel = model.fetch();
 
 // or update 
 
-updatedModelFromBackend = model.delete();
+updatedModelFromBackend = model.update();
 
 // why not fetch all dogs? 
 
