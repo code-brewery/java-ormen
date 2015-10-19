@@ -2,27 +2,23 @@ package org.codebrewery;
 
 import java.util.List;
 
-
-
 public abstract class Model {
 
     public static ApiInterface api() {
         return ApiFactory.getDefaultImplementation();
     }
 
-
     public abstract String getIdentifierValue();
-
 
     /**
      * Return a named ApiInterface that is typically different to the default apiImpl.
      *
      * <p>
-     * If you are using multiple restApis then each api has a name and maps to a single
-     * ApiInterface. You can use this method to get an ApiInterface for another restApi.
+     * If you are using multiple restApis then each api has a name and maps to a single ApiInterface. You can use this method to get an ApiInterface for another
+     * restApi.
      *
      * @param apiImpl
-     *          The name of the ApiInterface. If this is null then the default ApiInterface is returned.
+     *            The name of the ApiInterface. If this is null then the default ApiInterface is returned.
      */
     public static ApiInterface api(String apiImpl) {
         return null;
@@ -32,24 +28,25 @@ public abstract class Model {
      * Insert or update this model depending on its state.
      *
      * <p>
-     * ApiFactory will detect if this is a new model or a previously fetched model and perform either an
-     * insert or an update based on that.
+     * ApiFactory will detect if this is a new model or a previously fetched model and perform either an insert or an update based on that.
      *
      * You may see this as an smart method for update/insert.
+     * 
      * @see ApiInterface#save(Model)
      */
-    public Model save() throws JavaOrmenException {
-        return api().save(this);
+    @SuppressWarnings("unchecked")
+    public <T extends Model> T save() throws JavaOrmenException {
+        return api().save((T) this);
     }
-
 
     /**
      * Update this model.
      *
      * @see ApiInterface#update(Model)
      */
-    public Model update() throws JavaOrmenException{
-        return api().update(this);
+    @SuppressWarnings("unchecked")
+    public <T extends Model> T update() throws JavaOrmenException {
+        return api().update((T) this);
     }
 
     /**
@@ -57,8 +54,9 @@ public abstract class Model {
      *
      * @see ApiInterface#insert(Model)
      */
-    public Model insert() throws JavaOrmenException {
-        return api().insert(this);
+    @SuppressWarnings("unchecked")
+    public <T extends Model> T insert() throws JavaOrmenException {
+        return api().insert((T) this);
     }
 
     /**
@@ -70,61 +68,63 @@ public abstract class Model {
         api().delete(this);
     }
 
-
     /**
      * Refreshes this model from the API.
      *
      * @see ApiInterface#fetch(Model)
      */
-    public Model fetch() throws JavaOrmenException {
-        return api().fetch(this);
+    @SuppressWarnings("unchecked")
+    public <T extends Model> T fetch() throws JavaOrmenException {
+        return api().fetch((T) this);
     }
 
     /**
      * A concrete implementation of Find.
-     * <p>.
+     * <p>
+     * .
      * </p>
      */
-    public static class Finder  {
+    public static class Finder<T extends Model> {
 
-        private final Class<? extends Model> type;
-
+        private final Class<T> type;
 
         /**
          * Create with the type of the model model.
          *
-         * <pre>{@code
-         *
+         * <pre>
+         * {@code
+         * 
          * public class Customer extends BaseModel {
-         *
+         * 
          *   public static final Finder<Long,Customer> find = new Finder<Long,Customer>(Customer.class);
          *   ...
-         *
-         * }</pre>
+         * 
+         * }
+         * </pre>
          *
          * <p/>
-         * The preferred approach is to instead use <code>Find</code> as below. This approach is more DRY in that it does
-         * not require the class literal Customer.class to be passed into the constructor.
+         * The preferred approach is to instead use <code>Find</code> as below. This approach is more DRY in that it does not require the class literal
+         * Customer.class to be passed into the constructor.
          *
-         * <pre>{@code
-         *
+         * <pre>
+         * {@code
+         * 
          * public class Customer extends BaseModel {
-         *
+         * 
          *   public static final Find<Long,Customer> find = new Find<Long,Customer>(){};
          *   ...
-         *
-         * }</pre>
+         * 
+         * }
+         * </pre>
          */
 
-        public Finder( Class<? extends Model> type) {
-
+        public Finder(Class<T> type) {
             this.type = type;
         }
 
-        public List<Model> all() throws JavaOrmenException {
+        public List<T> all() throws JavaOrmenException {
             return api().getAll(this.type);
         }
     }
-
 
 }

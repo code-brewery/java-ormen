@@ -1,7 +1,6 @@
 package org.codebrewery;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Field;
 
 /**
  * Created by ejeserl on 9/19/15.

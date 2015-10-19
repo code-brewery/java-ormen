@@ -1,19 +1,16 @@
 package org.codebrewery;
 
+import static org.easymock.EasyMock.expect;
+import static org.junit.Assert.assertEquals;
+import static org.powermock.api.easymock.PowerMock.mockStatic;
+
+import java.util.List;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.powermock.api.easymock.PowerMock;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
-
-import java.util.List;
-
-import static org.easymock.EasyMock.expect;
-
-import static org.junit.Assert.assertEquals;
-import static org.powermock.api.easymock.PowerMock.*;
-
-
 
 /**
  * Created by ejeserl on 9/20/15.
@@ -23,32 +20,34 @@ import static org.powermock.api.easymock.PowerMock.*;
 @PrepareForTest(ApiFactory.class)
 public class TestModel {
 
-
     private ApiConfig apiConfig;
     private MockDefaultApiImplementation mockApiImpl;
+
     /**
      * All these tests will use powermock.
      *
      */
     public void setUpWithMock() {
 
-        setUpWithMock("plainPluto.json",null);
+        setUpWithMock("plainPluto.json", null);
 
     }
 
     public void setUpWithMock(String fileName) {
-        setUpWithMock(fileName,null);
+        setUpWithMock(fileName, null);
     }
+
     public void setUpWithMock(Exception exception) {
-        setUpWithMock(null,exception);
+        setUpWithMock(null, exception);
     }
-    public void setUpWithMock(String fileName,Exception e) {
+
+    public void setUpWithMock(String fileName, Exception e) {
         // 1. create config
         // 2. create mock
         // 3. init mock
 
         apiConfig = new ApiConfig.ConfigBuilder().apiLocation("api").port("8081").host("localhost").build();
-        mockApiImpl = new MockDefaultApiImplementation(apiConfig,fileName);
+        mockApiImpl = new MockDefaultApiImplementation(apiConfig, fileName);
         // We create a new instance of test class under test as usually.
 
         // This is the way to tell PowerMock to mock all static methods of a
@@ -62,29 +61,25 @@ public class TestModel {
 
     }
 
-
-
     @Test
     public void save_model() throws JavaOrmenException {
         setUpWithMock();
         Model model = new DogModel();
 
-        DogModel  changedModel  = (DogModel) model.save();
+        DogModel changedModel = (DogModel) model.save();
 
         // Note how we verify the class, not the instance!
         PowerMock.verifyAll();
         // Assert that the ID is correct
         assertEquals("pluto", changedModel.getName());
-        assertEquals("http://localhost:8081/api/dogs",mockApiImpl.getLatestExecutedRequestBuilder().getUrl());
+        assertEquals("http://localhost:8081/api/dogs", mockApiImpl.getLatestExecutedRequestBuilder().getUrl());
 
     }
-
-
 
     @Test
     public void delete_model() throws JavaOrmenException {
         setUpWithMock();
-        Model model = new DogModel("pluto",123);
+        Model model = new DogModel("pluto", 123);
 
         model.delete();
 
@@ -92,29 +87,27 @@ public class TestModel {
         PowerMock.verifyAll();
 
         // Assert that the ID is correct
-        assertEquals("http://localhost:8081/api/dogs/pluto",mockApiImpl.getLatestExecutedRequestBuilder().getUrl());
+        assertEquals("http://localhost:8081/api/dogs/pluto", mockApiImpl.getLatestExecutedRequestBuilder().getUrl());
     }
-
-
 
     @Test
     public void fetch_model() throws JavaOrmenException {
         setUpWithMock();
-        DogModel model = new DogModel("plutoXII",4);
+        DogModel model = new DogModel("plutoXII", 4);
 
-        DogModel  changedModel  = (DogModel) model.fetch();
+        DogModel changedModel = (DogModel) model.fetch();
 
         // Note how we verify the class, not the instance!
         PowerMock.verifyAll();
 
         // Assert that the ID is correct
         assertEquals("pluto", changedModel.getName());
-        assertEquals("http://localhost:8081/api/dogs/plutoXII",mockApiImpl.getLatestExecutedRequestBuilder().getUrl());
+        assertEquals("http://localhost:8081/api/dogs/plutoXII", mockApiImpl.getLatestExecutedRequestBuilder().getUrl());
 
         // verify that the returned model has an different name.
-        assertEquals("pluto",changedModel.getName());
+        assertEquals("pluto", changedModel.getName());
         // verify that the old model still got the old name
-        assertEquals("plutoXII",model.getName());
+        assertEquals("plutoXII", model.getName());
 
     }
 
@@ -122,9 +115,9 @@ public class TestModel {
     public void update_model() throws JavaOrmenException {
 
         setUpWithMock();
-        Model model = new DogModel("plutoXII",1234);
+        Model model = new DogModel("plutoXII", 1234);
 
-        DogModel  changedModel  = (DogModel) model.update();
+        DogModel changedModel = model.update();
 
         // Note how we verify the class, not the instance!
         PowerMock.verifyAll();
@@ -137,14 +130,14 @@ public class TestModel {
 
         setUpWithMock("twoPlutosInAList.json");
 
-        List<Model> listOfDogs = DogModel.find.all();
+        List<DogModel> listOfDogs = DogModel.find.all();
 
         // Note how we verify the class, not the instance!
         PowerMock.verifyAll();
 
         // Assert that the ID is correct
-        assertEquals(1,listOfDogs.size());
-        assertEquals("pluto",listOfDogs.get(0).getIdentifierValue());
+        assertEquals(1, listOfDogs.size());
+        assertEquals("pluto", listOfDogs.get(0).getIdentifierValue());
 
     }
 }

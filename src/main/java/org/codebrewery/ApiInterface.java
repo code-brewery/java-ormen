@@ -5,18 +5,18 @@ import java.util.List;
 /**
  * Created by ejeserl on 9/19/15.
  */
-public interface ApiInterface<T> {
+public interface ApiInterface {
 
-    Model save(Model model) throws JavaOrmenException;
+    <M extends Model> M save(M model) throws JavaOrmenException;
 
-    Model update(Model model) throws JavaOrmenException;
+    <M extends Model> M update(M model) throws JavaOrmenException;
 
-    Model insert(Model model) throws JavaOrmenException;
+    <M extends Model> M insert(M model) throws JavaOrmenException;
 
-    void delete(Model model) throws JavaOrmenException;
+    <M extends Model> void delete(M model) throws JavaOrmenException;
 
-    Model fetch(Model model) throws JavaOrmenException;
+    <M extends Model> M fetch(M model) throws JavaOrmenException;
 
-    List<Model> getAll(Class<? extends Model> aClass) throws JavaOrmenException;
+    <M extends Model> List<M> getAll(Class<M> aClass) throws JavaOrmenException;
 
 }
